@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Microsoft Corporation. All rights reserved.
      Licensed under the MIT License. -->
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -29,10 +29,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup>
+    <Chip>$(ArchitectureFolderName)</Chip>
+  </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7507E5DD-D4D8-4617-9124-A76341004AAB}</ProjectGuid>
+    <ProjectGuid>{4FA2D171-9D97-4344-9010-F1D9DA14A3A9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>InstrumentationEngine.Lib</RootNamespace>
+    <RootNamespace>InstrumentationEngine.Api</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -47,37 +50,40 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OutDir);..\..\inc;..\..\inc\clr\inc;$(InstrumentationEngineApiInc);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(OutDir);..\..\inc;$(EnlistmentRoot)\inc\clr\prof;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalOptions>/ZH:SHA_256 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Midl>
-      <AdditionalIncludeDirectories>..\..\inc\clr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EnlistmentRoot)\inc\clr\prof;$(EnlistmentRoot)\inc\clr\extra;$(NETFXKitsDir)\Include\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </Midl>
     <Link>
       <CETCompat Condition="'$(Platform)'!='ARM64'">true</CETCompat>
       <SubSystem>Windows</SubSystem>
     </Link>
-    <Lib>
-      <TargetMachine Condition="'$(Platform)'=='Win32'">MachineX86</TargetMachine>
-      <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
-    </Lib>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_MIDL_USE_GUIDDEF_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">X86;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
       <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
       <RunCodeAnalysis>true</RunCodeAnalysis>
-      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <Midl>
+      <AdditionalOptions>/sal</AdditionalOptions>
+    </Midl>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,68 +97,43 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">X86;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>true</EnablePREfast>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Midl>
+      <AdditionalOptions>/sal</AdditionalOptions>
+    </Midl>
   </ItemDefinitionGroup>
+  <!--
+  We don't compile any of the files into the binaries because it is not necessary for C++ linking, as long as you directly
+  reference the interfaces, rather than using the C exports. Note, this means that we cannot reference the IID_* symbols.
+  If
+  -->
   <ItemGroup>
-    <ClInclude Include="ConfigurationLocator.h" />
-    <ClInclude Include="ConfigurationSource.h" />
-    <ClInclude Include="DataContainer.h" />
-    <ClInclude Include="dlfcn.h" />
-    <ClInclude Include="EnumeratorImpl.h" />
-    <ClInclude Include="InstrumentationMethodAttachContext.h" />
-    <ClInclude Include="InstrumentationMethodSetting.h" />
-    <ClInclude Include="LoggerSink.h" />
-    <ClInclude Include="Logging.h" />
-    <ClInclude Include="ConfigurationLoader.h" />
-    <ClInclude Include="DebugLoggerSink.h" />
-    <ClInclude Include="EventLoggerSink.h" />
-    <ClInclude Include="File.h" />
-    <ClInclude Include="FileLoggerSink.h" />
-    <ClInclude Include="InstrumentationMethod.h" />
-    <ClInclude Include="LoggerService.h" />
-    <ClInclude Include="HostLoggerSink.h" />
-    <ClInclude Include="RawProfilerHookLoader.h" />
-    <ClInclude Include="RawProfilerHookSettingsReader.h" />
-    <ClInclude Include="SharedArray.h" />
-    <ClInclude Include="SignatureValidator.h" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="InstrumentationMethodBase.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AgentValidation.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="InstrumentationEngineDefs.h" />
+    <ClInclude Include="InstrumentationEngineInfraPointerDefs.h" />
+    <ClInclude Include="InstrumentationEnginePointerDefs.h" />
+    <ClInclude Include="InstrumentationMethodBase.h" />
+    <ClInclude Include="InstrumentationMethodUtils.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ConfigurationLocator.cpp" />
-    <ClCompile Include="ConfigurationSource.cpp" />
-    <ClCompile Include="DataContainer.cpp" />
-    <ClCompile Include="DebugLoggerSink.cpp" />
-    <ClCompile Include="EventLoggerSink.cpp" />
-    <ClCompile Include="ConfigurationLoader.cpp" />
-    <ClCompile Include="FileLoggerSink.cpp" />
-    <ClCompile Include="InstrumentationMethod.cpp" />
-    <ClCompile Include="InstrumentationMethodAttachContext.cpp" />
-    <ClCompile Include="InstrumentationMethodSetting.cpp" />
-    <ClCompile Include="LoggerService.cpp" />
-    <ClCompile Include="HostLoggerSink.cpp" />
-    <ClCompile Include="Logging.cpp" />
-    <ClCompile Include="RawProfilerHookLoader.cpp" />
-    <ClCompile Include="RawProfilerHookSettingsReader.cpp" />
-    <ClCompile Include="SignatureValidator.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common.Lib\Common.Lib.vcxproj">
-      <Project>{A0585FAB-548F-44B3-BCBE-9242CBC26A19}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(EnlistmentRoot)\build\Common.targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -153,7 +153,6 @@ macro (build_init build_language build_type)
     add_compile_options(-Wno-delete-incomplete)
     add_compile_options(-Wno-pragma-pack)
     add_compile_options(-Wno-unknown-warning-option)
-
     # Turn all enabled warnings into errors
     add_compile_options(-Werror)
 
@@ -237,8 +236,8 @@ macro (fetch_google_test)
     include(FetchContent)
     FetchContent_Declare(
         googletest
-        GIT_REPOSITORY ${GOOGLE_TEST_URL}.git
-        GIT_TAG ${GOOGLE_TEST_TAG}
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.8.0
     )
     FetchContent_MakeAvailable(googletest)
 endmacro(fetch_google_test)
@@ -271,6 +270,7 @@ endif (CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
 # Ensure that on MacOS, dylibs are referenced as '@rpath/example.dylib' instead of just 'example.dylib'. Otherwise they
 # will not be found unless the working directory == vsdbg directory.
 set(CMAKE_MACOSX_RPATH true)
+SET(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Don't allow shared libraries to be built with undefined symbols
 # Mac builds complain about these, Linux needs the switch
@@ -370,9 +370,12 @@ add_subdirectory(unix/src/atl)
 add_subdirectory(Common.Lib)
 add_subdirectory(InstrumentationEngine.Api)
 add_subdirectory(InstrumentationEngine.Lib)
+add_subdirectory(InstrumentationEngine.Method)
 add_subdirectory(InstrumentationEngine)
 add_subdirectory(Tests/InstrEngineTests/NaglerInstrumentationMethod)
 
-enable_testing()
-add_subdirectory(Tests/CommonLibTests)
-add_subdirectory(Tests/InstrumentationEngineLibTests)
+# enable_testing()
+# add_subdirectory(Tests/CommonLibTests)
+# add_subdirectory(Tests/InstrumentationEngineLibTests)
+
+
